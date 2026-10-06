@@ -3,7 +3,7 @@
 ; raccourci bureau optionnel) à partir de l'exe self-contained publié.
 
 #define AppName "AirGlass"
-#define AppVersion "1.0.0"
+#define AppVersion "1.1.0"
 #define AppPublisher "AirGlass"
 #define AppExeName "AirGlass.exe"
 ; Chemin de l'exe single-file produit par « dotnet publish ... PublishSingleFile=true »
