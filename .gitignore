@@ -1,0 +1,40 @@
+# Build output
+bin/
+obj/
+publish/
+artifacts/
+
+# Visual Studio / Rider / VS Code
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+*.rsuser
+
+# NuGet
+*.nupkg
+packages/
+
+# Logs and temp
+*.log
+*.tmp
+gstreg.bin
+
+# Installer output (rebuild with scripts/build-release.ps1)
+Installer/Output/
+
+# Embedded git repos (not versioned here)
+external/uxplay/
+third_party/UxPlay/
+
+# Node
+node_modules/
+
+# Secrets and license keys (never commit)
+.env
+.env.*
+*.pem
+*.key
+*.pfx
+.airserver-license

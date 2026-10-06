@@ -1,0 +1,35 @@
+AirGlass - Third-party software notices
+========================================
+
+AirGlass's own user interface is proprietary software.
+It starts and controls the separate program "uxplay.exe" (see below).
+That program is not part of AirGlass's own code and keeps its own license.
+
+1. UxPlay (uxplay.exe)
+----------------------
+AirPlay mirroring server for Unix and Windows.
+License: GNU General Public License v3.0 (GPLv3).
+Source code: https://github.com/FDH2/UxPlay
+Full license text: licenses\UxPlay-LICENSE.txt
+
+uxplay.exe is run as an independent process. AirGlass's interface and
+UxPlay communicate only through the command line and the process output.
+You have the right to obtain, study, modify and redistribute the UxPlay
+source code under the terms of the GPLv3.
+
+UxPlay includes the following components:
+- playfair (FairPlay): GNU GPL. See licenses\playfair-LICENSE.md
+- llhttp: MIT. See licenses\llhttp-LICENSE-MIT
+
+2. GStreamer, FFmpeg and codec libraries (DLL files in uxplay-win\)
+-------------------------------------------------------------------
+Distributed unmodified as separate dynamic libraries. They are licensed
+under the LGPL or GPL depending on the library (for example x264 and x265
+are GPL). Their source code is available from their upstream projects:
+- GStreamer: https://gstreamer.freedesktop.org
+- FFmpeg: https://ffmpeg.org
+
+3. Trademarks
+-------------
+AirPlay, iPhone and iOS are trademarks of Apple Inc. AirGlass is not
+affiliated with, endorsed by, or sponsored by Apple Inc.

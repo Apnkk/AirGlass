@@ -1,0 +1,18 @@
+{
+  "name": "airglass-promo",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "audio": "node scripts/make-audio.mjs",
+    "prestart": "npm run audio",
+    "start": "remotion studio src/index.jsx",
+    "prebuild": "npm run audio",
+    "build": "remotion render src/index.jsx AirGlassPromo out/airglass-promo.mp4"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.533",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "remotion": "^4.0.533"
+  }
+}

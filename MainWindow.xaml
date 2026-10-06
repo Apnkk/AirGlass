@@ -1,0 +1,186 @@
+﻿<Window x:Class="AirGlass.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:svc="clr-namespace:AirGlass.Services"
+        Title="AirGlass"
+        Icon="{StaticResource LogoImage}"
+        Height="700" Width="1100"
+        MinHeight="560" MinWidth="860"
+        WindowStartupLocation="CenterScreen"
+        svc:GlassBackdrop.Enabled="True"
+        Background="{StaticResource WindowSolidBrush}"
+        Foreground="{StaticResource TextBrush}"
+        FontFamily="{StaticResource UiFont}"
+        UseLayoutRounding="True"
+        Closing="OnClosing"
+        Closed="OnClosed">
+
+  <WindowChrome.WindowChrome>
+    <WindowChrome CaptionHeight="40" ResizeBorderThickness="6"
+                  GlassFrameThickness="0" CornerRadius="0"
+                  UseAeroCaptionButtons="False" />
+  </WindowChrome.WindowChrome>
+
+  <Grid x:Name="RootGrid">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="40" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <!-- Barre de titre façon macOS -->
+    <Grid Grid.Row="0">
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center"
+                  Margin="0,0,16,0" Background="Transparent"
+                  WindowChrome.IsHitTestVisibleInChrome="True">
+        <Button Style="{StaticResource TrafficLightButton}" Background="#FEBC2E" Tag="–"
+                ToolTip="Réduire" AutomationProperties.Name="Réduire"
+                Click="OnTitleMinimize" />
+        <Button Style="{StaticResource TrafficLightButton}" Background="#28C840" Tag="+"
+                ToolTip="Agrandir" AutomationProperties.Name="Agrandir" Margin="8,0,0,0"
+                Click="OnTitleMaximize" />
+        <Button Style="{StaticResource TrafficLightButton}" Background="#FF5F57" Tag="×"
+                ToolTip="Fermer" AutomationProperties.Name="Fermer" Margin="8,0,0,0"
+                Click="OnTitleClose" />
+      </StackPanel>
+
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center"
+                  IsHitTestVisible="False">
+        <Image Source="{StaticResource LogoImage}" Width="18" Height="18"
+               RenderOptions.BitmapScalingMode="HighQuality" />
+        <TextBlock Text="AirGlass" Margin="8,0,0,0" VerticalAlignment="Center"
+                   Foreground="{StaticResource MutedBrush}"
+                   FontSize="12" FontWeight="SemiBold" />
+      </StackPanel>
+    </Grid>
+
+    <!-- Contenu -->
+    <Grid Grid.Row="1">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="*" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
+
+      <!-- Actions -->
+      <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right"
+                  Margin="28,8,28,0">
+        <Button Style="{StaticResource GhostButton}" Content="Réglages"
+                Padding="14,6" FontSize="12" Margin="0,0,8,0" Click="OnSettingsClick" />
+        <Button Style="{StaticResource GhostButton}" Content="À propos"
+                Padding="14,6" FontSize="12" Click="OnAboutClick" />
+      </StackPanel>
+
+      <!-- Bandeaux d'alerte (pare-feu, licence) -->
+      <StackPanel Grid.Row="1" Margin="28,0,28,0">
+        <Border x:Name="FirewallBanner" Visibility="Collapsed"
+                Style="{StaticResource GlassCard}" CornerRadius="12"
+                Padding="16,10" Margin="0,14,0,0">
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" VerticalAlignment="Center" TextWrapping="Wrap"
+                       FontSize="12" Margin="0,0,14,0"
+                       Text="Le pare-feu Windows bloque peut-être AirGlass : l'iPhone risque de ne pas te voir." />
+            <Button x:Name="FixFirewallButton" Grid.Column="1" Style="{StaticResource ModernButton}"
+                    Content="Réparer le pare-feu" Padding="14,6" FontSize="12"
+                    Click="OnFixFirewallClick" />
+          </Grid>
+        </Border>
+
+      </StackPanel>
+
+      <!-- Contenu central -->
+      <Viewbox Grid.Row="2" StretchDirection="DownOnly" Stretch="Uniform" Margin="24">
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+
+          <Grid Width="190" Height="190" HorizontalAlignment="Center">
+            <Ellipse x:Name="StatusHalo" Width="112" Height="112" StrokeThickness="1.5"
+                     Stroke="{StaticResource AccentBrush}" Opacity="0"
+                     HorizontalAlignment="Center" VerticalAlignment="Center"
+                     RenderTransformOrigin="0.5,0.5">
+              <Ellipse.RenderTransform>
+                <ScaleTransform x:Name="StatusHaloScale" ScaleX="1" ScaleY="1" />
+              </Ellipse.RenderTransform>
+            </Ellipse>
+            <Border x:Name="StatusRing" Width="112" Height="112" CornerRadius="56"
+                    Background="{StaticResource PanelBrush}"
+                    BorderBrush="{StaticResource AccentBrush}" BorderThickness="1.5"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    RenderTransformOrigin="0.5,0.5">
+              <Border.RenderTransform>
+                <ScaleTransform x:Name="StatusRingScale" ScaleX="1" ScaleY="1" />
+              </Border.RenderTransform>
+              <TextBlock x:Name="StatusGlyph" Text="&#xE7F4;" FontFamily="{StaticResource IconFont}"
+                         FontSize="44" Foreground="{StaticResource TextBrush}"
+                         HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+          </Grid>
+
+          <TextBlock x:Name="StatusText" Text="Démarrage…"
+                     FontFamily="{StaticResource UiDisplayFont}"
+                     FontSize="22" FontWeight="SemiBold"
+                     HorizontalAlignment="Center" TextAlignment="Center"
+                     TextWrapping="Wrap" MaxWidth="520" Margin="0,8,0,6" />
+
+          <TextBlock x:Name="StatusDetail"
+                     Text="Initialisation du récepteur"
+                     FontSize="13" LineHeight="20" Foreground="{StaticResource MutedBrush}"
+                     HorizontalAlignment="Center" TextAlignment="Center"
+                     MaxWidth="420" TextWrapping="Wrap" />
+
+          <Border Background="{StaticResource PanelBrush}"
+                  BorderBrush="{StaticResource GlassStrokeBrush}" BorderThickness="1"
+                  CornerRadius="10" Padding="22,10" Margin="0,28,0,0"
+                  HorizontalAlignment="Center">
+            <StackPanel>
+              <TextBlock x:Name="ReceiverLabel" Text="Nom affiché sur l'iPhone"
+                         FontSize="11" Foreground="{StaticResource MutedBrush}"
+                         HorizontalAlignment="Center" />
+              <TextBlock x:Name="ReceiverName" Text="—"
+                         FontSize="16" FontWeight="SemiBold"
+                         HorizontalAlignment="Center" Margin="0,3,0,0" />
+            </StackPanel>
+          </Border>
+
+
+        </StackPanel>
+      </Viewbox>
+
+      <!-- Bascule Apple / Android (coin bas droit) -->
+        <Button x:Name="SwitchModeButton" Style="{StaticResource GhostButton}"
+                Grid.Row="3" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                Margin="0,0,16,14" Padding="10,6" Click="OnSwitchModeClick"
+                ToolTip="Passer sur Android" AutomationProperties.Name="Passer sur Android">
+          <Viewbox Width="16" Height="16">
+            <Grid Width="24" Height="24">
+              <Path x:Name="SwitchAppleLogo" Visibility="Collapsed"
+                    Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                    Data="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701" />
+              <Grid x:Name="SwitchAndroidLogo">
+                <Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                      Data="M6,9 A6,6 0 0 1 18,9 Z M8.7,6 A0.8,0.8 0 1 0 10.3,6 A0.8,0.8 0 1 0 8.7,6 Z M13.7,6 A0.8,0.8 0 1 0 15.3,6 A0.8,0.8 0 1 0 13.7,6 Z M6,10 H18 V17 A1,1 0 0 1 17,18 H7 A1,1 0 0 1 6,17 Z M8,18 H10 V21 H8 Z M14,18 H16 V21 H14 Z M3,10 H5 V16 H3 Z M19,10 H21 V16 H19 Z" />
+                <Path Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                      StrokeThickness="1" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                      Data="M8,3 L9.2,5 M16,3 L14.8,5" />
+              </Grid>
+            </Grid>
+          </Viewbox>
+        </Button>
+
+      <!-- Vidéo AirPlay incrustée (fenêtre d'uxplay) -->
+      <Border x:Name="VideoPanel" Grid.Row="0" Grid.RowSpan="4" Margin="0"
+              Background="#000000" Visibility="Collapsed">
+        <svc:VideoHost x:Name="VideoView" />
+      </Border>
+
+      <!-- Pied de page -->
+      <TextBlock x:Name="FooterHint" Grid.Row="3" Margin="72,0,72,20"
+                 Foreground="{StaticResource MutedBrush}" FontSize="12"
+                 HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center"
+                 Text="Sur l'iPhone : Centre de contrôle → Recopie de l'écran → choisis ce PC" />
+    </Grid>
+  </Grid>
+</Window>

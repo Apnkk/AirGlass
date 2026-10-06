@@ -1,0 +1,245 @@
+<Window x:Class="AirGlass.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:svc="clr-namespace:AirGlass.Services"
+        Title="Réglages"
+        Width="640" Height="520"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        svc:GlassBackdrop.Enabled="True"
+        Background="{StaticResource WindowSolidBrush}"
+        Foreground="{StaticResource TextBrush}"
+        FontFamily="{StaticResource UiFont}"
+        UseLayoutRounding="True">
+
+  <Window.Resources>
+    <BooleanToVisibilityConverter x:Key="BoolToVis" />
+
+    <!-- Liste des appareils refusés -->
+    <Style x:Key="DeviceList" TargetType="ListBox">
+      <Setter Property="Background" Value="#14FFFFFF" />
+      <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+      <Setter Property="BorderBrush" Value="#1FFFFFFF" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="Padding" Value="4" />
+      <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+      <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+      <Setter Property="ItemContainerStyle">
+        <Setter.Value>
+          <Style TargetType="ListBoxItem">
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+              <Setter.Value>
+                <ControlTemplate TargetType="ListBoxItem">
+                  <Border x:Name="bg" CornerRadius="6" Padding="8,6" Background="Transparent"
+                          SnapsToDevicePixels="True">
+                    <ContentPresenter VerticalAlignment="Center" />
+                  </Border>
+                  <ControlTemplate.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                      <Setter TargetName="bg" Property="Background" Value="#14FFFFFF" />
+                    </Trigger>
+                    <Trigger Property="IsSelected" Value="True">
+                      <Setter TargetName="bg" Property="Background" Value="#26FFFFFF" />
+                    </Trigger>
+                  </ControlTemplate.Triggers>
+                </ControlTemplate>
+              </Setter.Value>
+            </Setter>
+          </Style>
+        </Setter.Value>
+      </Setter>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="ListBox">
+            <Border Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    CornerRadius="8" SnapsToDevicePixels="True">
+              <ScrollViewer Focusable="False" Padding="{TemplateBinding Padding}">
+                <ItemsPresenter />
+              </ScrollViewer>
+            </Border>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <!-- Entrée de la barre latérale -->
+    <Style x:Key="NavItem" TargetType="RadioButton">
+      <Setter Property="Foreground" Value="{StaticResource MutedBrush}" />
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="Margin" Value="0,0,0,4" />
+      <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="RadioButton">
+            <Border x:Name="bg" CornerRadius="8" Padding="12,9" Background="Transparent"
+                    SnapsToDevicePixels="True">
+              <ContentPresenter VerticalAlignment="Center" />
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="bg" Property="Background" Value="#14FFFFFF" />
+                <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+              </Trigger>
+              <Trigger Property="IsChecked" Value="True">
+                <Setter TargetName="bg" Property="Background" Value="#26FFFFFF" />
+                <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+  </Window.Resources>
+
+  <WindowChrome.WindowChrome>
+    <WindowChrome CaptionHeight="56" ResizeBorderThickness="0"
+                  GlassFrameThickness="0" CornerRadius="0"
+                  UseAeroCaptionButtons="False" />
+  </WindowChrome.WindowChrome>
+
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="176" />
+      <ColumnDefinition Width="*" />
+    </Grid.ColumnDefinitions>
+
+    <!-- Barre latérale -->
+    <Border Grid.Column="0" Background="#14000000">
+      <StackPanel Margin="16,22,16,16" WindowChrome.IsHitTestVisibleInChrome="True">
+        <TextBlock Text="Réglages" FontFamily="{StaticResource UiDisplayFont}"
+                   FontSize="20" FontWeight="SemiBold" Margin="12,0,0,20" />
+        <RadioButton x:Name="NavGeneral" Style="{StaticResource NavItem}" Content="Général"
+                     GroupName="SettingsNav" IsChecked="True" />
+        <RadioButton x:Name="NavMirror" Style="{StaticResource NavItem}" Content="Recopie"
+                     GroupName="SettingsNav" />
+        <RadioButton x:Name="NavSecurity" Style="{StaticResource NavItem}" Content="Sécurité"
+                     GroupName="SettingsNav" />
+        <RadioButton x:Name="NavAbout" Style="{StaticResource NavItem}" Content="À propos"
+                     GroupName="SettingsNav" />
+      </StackPanel>
+    </Border>
+
+    <!-- Contenu -->
+    <Grid Grid.Column="1" Margin="28,56,28,18">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="*" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
+
+      <Grid Grid.Row="0">
+
+        <!-- Général -->
+        <StackPanel Visibility="{Binding IsChecked, ElementName=NavGeneral, Converter={StaticResource BoolToVis}}">
+          <TextBlock Text="Nom affiché sur l'iPhone" FontSize="12"
+                     Foreground="{StaticResource MutedBrush}" Margin="0,0,0,6" />
+          <TextBox x:Name="NameBox" MaxLength="40" FontSize="13" Padding="10,6" />
+          <TextBlock x:Name="NameHint" FontSize="11" TextWrapping="Wrap"
+                     Foreground="{StaticResource MutedBrush}" Margin="0,6,0,14" />
+
+          <Rectangle Height="1" Fill="#1FFFFFFF" />
+          <CheckBox x:Name="StartWithWindowsBox" Content="Démarrer avec Windows" Margin="0,12" />
+          <Rectangle Height="1" Fill="#1FFFFFFF" />
+          <CheckBox x:Name="StartMinimizedBox" Content="Démarrer réduit" Margin="0,12" />
+          <Rectangle Height="1" Fill="#1FFFFFFF" />
+          <CheckBox x:Name="MinimizeToTrayBox" Content="Fermer = réduire dans la zone de notification" Margin="0,12" />
+        </StackPanel>
+
+        <!-- Recopie -->
+        <StackPanel Visibility="{Binding IsChecked, ElementName=NavMirror, Converter={StaticResource BoolToVis}}">
+          <CheckBox x:Name="KeepOnTopBox" Content="Fenêtre au premier plan pendant la recopie" Margin="0,0,0,12" />
+          <Rectangle Height="1" Fill="#1FFFFFFF" />
+          <CheckBox x:Name="NoHoldBox" Content="Une nouvelle connexion remplace l'actuelle" Margin="0,12" />
+          <Rectangle Height="1" Fill="#1FFFFFFF" />
+          <CheckBox x:Name="Fps60Box" Content="60 images/s (fluidité maximale)" Margin="0,12" />
+          <Rectangle Height="1" Fill="#1FFFFFFF" />
+          <TextBlock Text="Qualité de la recopie" FontSize="12"
+                     Foreground="{StaticResource MutedBrush}" Margin="0,12,0,8" />
+          <WrapPanel x:Name="QualityPanel">
+            <RadioButton Style="{StaticResource NavItem}" GroupName="Quality" Tag="2160" Content="4K"
+                         Margin="0,0,6,6" ToolTip="H.265, si l'iPhone le gère" />
+            <RadioButton Style="{StaticResource NavItem}" GroupName="Quality" Tag="1440" Content="1440p"
+                         Margin="0,0,6,6" />
+            <RadioButton Style="{StaticResource NavItem}" GroupName="Quality" Tag="1080" Content="1080p"
+                         Margin="0,0,6,6" />
+            <RadioButton Style="{StaticResource NavItem}" GroupName="Quality" Tag="720" Content="720p"
+                         Margin="0,0,6,6" />
+            <RadioButton Style="{StaticResource NavItem}" GroupName="Quality" Tag="480" Content="480p"
+                         Margin="0,0,6,6" />
+          </WrapPanel>
+          <TextBlock Text="Plus bas = moins de bande passante et de latence. Le récepteur redémarre au changement."
+                     FontSize="11" TextWrapping="Wrap" Margin="0,0,0,12"
+                     Foreground="{StaticResource MutedBrush}" />
+          <Rectangle Height="1" Fill="#1FFFFFFF" />
+          <CheckBox x:Name="LowLatencyBox" Content="Faible latence (jeux, moins de synchro audio/vidéo)" Margin="0,12" />
+          <Rectangle Height="1" Fill="#1FFFFFFF" />
+          <CheckBox x:Name="AudioOffBox" Content="Couper le son (vidéo seule)" Margin="0,12" />
+          <Rectangle Height="1" Fill="#1FFFFFFF" />
+          <TextBlock Text="Pendant la recopie : F11 plein écran, Échap pour quitter, F12 capture d'écran."
+                     FontSize="11" TextWrapping="Wrap" Margin="0,12,0,0"
+                     Foreground="{StaticResource MutedBrush}" />
+        </StackPanel>
+
+        <!-- Sécurité -->
+        <StackPanel x:Name="SecurityPanel" Visibility="{Binding IsChecked, ElementName=NavSecurity, Converter={StaticResource BoolToVis}}">
+          <CheckBox x:Name="UsePinBox" Content="Demander un code PIN sur l'iPhone" Margin="0,0,0,12" />
+          <Rectangle Height="1" Fill="#1FFFFFFF" />
+          <TextBlock Text="Code PIN (4 chiffres)" FontSize="12"
+                     Foreground="{StaticResource MutedBrush}" Margin="0,12,0,6" />
+          <TextBox x:Name="PinBox" MaxLength="4" Width="96" FontSize="14" Padding="8,5"
+                   HorizontalAlignment="Left" HorizontalContentAlignment="Center"
+                   ToolTip="4 chiffres, ou vide pour un code aléatoire"
+                   AutomationProperties.Name="Code PIN"
+                   IsEnabled="{Binding IsChecked, ElementName=UsePinBox}" />
+          <TextBlock Text="Laisse vide : un code aléatoire s'affiche dans AirGlass à chaque connexion."
+                     FontSize="11" TextWrapping="Wrap" Margin="0,8,0,0"
+                     Foreground="{StaticResource MutedBrush}" />
+          <Rectangle Height="1" Fill="#1FFFFFFF" Margin="0,16,0,0" />
+          <TextBlock Text="Appareils refusés" FontSize="12"
+                     Foreground="{StaticResource MutedBrush}" Margin="0,14,0,6" />
+          <ListBox x:Name="BlockedList" Style="{StaticResource DeviceList}" MinHeight="48" MaxHeight="110"
+                   AutomationProperties.Name="Appareils refusés" />
+          <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+            <Button x:Name="BlockLastButton" Style="{StaticResource GhostButton}"
+                    Content="Refuser le dernier appareil" Padding="12,6" FontSize="12"
+                    Margin="0,0,8,0" Click="OnBlockLast" />
+            <Button x:Name="UnblockButton" Style="{StaticResource GhostButton}"
+                    Content="Autoriser" Padding="12,6" FontSize="12" Click="OnUnblock" />
+          </StackPanel>
+        </StackPanel>
+
+        <!-- À propos -->
+        <StackPanel Visibility="{Binding IsChecked, ElementName=NavAbout, Converter={StaticResource BoolToVis}}">
+          <TextBlock Text="Dépannage" FontSize="12"
+                     Foreground="{StaticResource MutedBrush}" Margin="0,0,0,8" />
+          <Button Style="{StaticResource GhostButton}" Content="Ouvrir les journaux"
+                  Padding="12,6" FontSize="12" HorizontalAlignment="Left" Click="OnOpenLogs" />
+        </StackPanel>
+
+      </Grid>
+
+      <TextBlock x:Name="ErrorText" Grid.Row="1" Visibility="Collapsed"
+                 Foreground="{StaticResource DangerBrush}"
+                 FontSize="12" TextWrapping="Wrap" Margin="0,8,0,0" />
+
+      <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+        <Button Style="{StaticResource GhostButton}" Content="Annuler"
+                Padding="14,6" FontSize="12" Margin="0,0,8,0" IsCancel="True" />
+        <Button Style="{StaticResource ModernButton}" Content="Enregistrer"
+                Padding="18,6" FontSize="12" IsDefault="True" Click="OnSave" />
+      </StackPanel>
+    </Grid>
+
+    <Button Grid.Column="1" Style="{StaticResource TrafficLightButton}" Background="#FF5F57" Tag="×"
+            HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,18,18,0"
+            ToolTip="Fermer" AutomationProperties.Name="Fermer"
+            WindowChrome.IsHitTestVisibleInChrome="True" Click="OnTitleClose" />
+  </Grid>
+</Window>
