@@ -63,9 +63,9 @@ Source: "..\external\scrcpy-win\*"; DestDir: "{app}\scrcpy-win"; Flags: ignoreve
 
 ; Mentions légales : licence GPLv3 d'UxPlay, licences des composants inclus.
 Source: "..\THIRD-PARTY-NOTICES.txt"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\third_party\UxPlay\LICENSE"; DestDir: "{app}\licenses"; DestName: "UxPlay-LICENSE.txt"; Flags: ignoreversion
-Source: "..\third_party\UxPlay\lib\playfair\LICENSE.md"; DestDir: "{app}\licenses"; DestName: "playfair-LICENSE.md"; Flags: ignoreversion
-Source: "..\third_party\UxPlay\lib\llhttp\LICENSE-MIT"; DestDir: "{app}\licenses"; DestName: "llhttp-LICENSE-MIT"; Flags: ignoreversion
+Source: "..\licenses\UxPlay\LICENSE"; DestDir: "{app}\licenses"; DestName: "UxPlay-LICENSE.txt"; Flags: ignoreversion
+Source: "..\licenses\UxPlay\playfair-LICENSE.md"; DestDir: "{app}\licenses"; DestName: "playfair-LICENSE.md"; Flags: ignoreversion
+Source: "..\licenses\UxPlay\llhttp-LICENSE-MIT"; DestDir: "{app}\licenses"; DestName: "llhttp-LICENSE-MIT"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExeName}"
