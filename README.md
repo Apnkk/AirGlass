@@ -7,8 +7,11 @@ Recopie l'écran d'un iPhone ou d'un téléphone Android sur Windows.
 
 ## Vidéos de présentation
 
-- [Présentation AirGlass (Apple)](docs/videos/airglass-promo.mp4)
-- [Présentation AirGlass (Android)](docs/videos/airglass-android-promo.mp4)
+Clique sur une image pour lire la vidéo.
+
+[![Présentation AirGlass (Apple)](docs/videos/airglass-promo.jpg)](docs/videos/airglass-promo.mp4)
+
+[![Présentation AirGlass (Android)](docs/videos/airglass-android-promo.jpg)](docs/videos/airglass-android-promo.mp4)
 
 ## Utilisation
 
