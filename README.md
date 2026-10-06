@@ -60,7 +60,7 @@ npm run build:android   # out\airglass-android-promo.mp4
 
 | Dossier | Contenu |
 |---|---|
-| `Services/` | Lancement d'UxPlay et scrcpy, réseau, réglages, licence |
+| `Services/` | Lancement d'UxPlay et scrcpy, réseau, réglages |
 | `Installer/` | Script Inno Setup et visuels de l'assistant |
 | `scripts/` | Build, génération d'icône et d'images d'installeur |
 | `promo/` | Projet Remotion des vidéos de présentation |
