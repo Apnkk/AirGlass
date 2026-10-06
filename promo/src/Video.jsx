@@ -768,6 +768,46 @@ const Story = () => {
           </svg>
           <AppWindow width={winW} height={winH} left={winLeft} top={winTop}>
             <GameScene width={Math.round(winW) - 2} height={Math.round(winH) - 42} />
+            <div
+              style={{
+                position: 'absolute',
+                top: 36,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                display: 'flex',
+                padding: 4,
+                borderRadius: 12,
+                background: '#E6121419',
+                border: `1px solid ${BORDER}`,
+                boxShadow: '0 2px 16px rgba(0,0,0,0.45)',
+                opacity: progress(f, 250, 272),
+              }}
+            >
+              {['\uE740', '\uE722', '1080p'].map((item) => {
+                const isLabel = item === '1080p';
+                return (
+                  <div
+                    key={item}
+                    style={{
+                      height: 36,
+                      minWidth: 36,
+                      boxSizing: 'border-box',
+                      padding: isLabel ? '0 8px' : 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: 8,
+                      color: TEXT,
+                      fontSize: isLabel ? 12 : 16,
+                      fontWeight: isLabel ? 600 : 400,
+                      fontFamily: isLabel ? FONT : 'Segoe Fluent Icons, Segoe MDL2 Assets',
+                    }}
+                  >
+                    {item}
+                  </div>
+                );
+              })}
+            </div>
           </AppWindow>
           <div
             style={{
@@ -851,6 +891,29 @@ const Outro = () => {
       </AbsoluteFill>
     </Fade>
   );
+};
+
+export {
+  INTRO,
+  OUTRO,
+  BG,
+  TEXT,
+  MUTED,
+  ACCENT,
+  BORDER,
+  FONT,
+  clamp,
+  easeOut,
+  easeInOut,
+  progress,
+  lerp,
+  stroke,
+  centered,
+  Backdrop,
+  Fade,
+  Logo,
+  GameScene,
+  AppWindow,
 };
 
 export const AirGlassPromo = () => (

@@ -7,7 +7,8 @@
     "prestart": "npm run audio",
     "start": "remotion studio src/index.jsx",
     "prebuild": "npm run audio",
-    "build": "remotion render src/index.jsx AirGlassPromo out/airglass-promo.mp4"
+    "build": "remotion render src/index.jsx AirGlassPromo out/airglass-promo.mp4",
+    "build:android": "npm run audio && remotion render src/index.jsx AirGlassAndroidPromo out/airglass-android-promo.mp4"
   },
   "dependencies": {
     "@remotion/cli": "^4.0.533",

@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.IO;
+using System.Net.NetworkInformation;
 
 namespace AirGlass.Services;
 
@@ -23,6 +24,7 @@ public sealed class UxPlayLauncher : IDisposable
     private const int MaxRapidCrashes = 5;
     private static readonly TimeSpan RapidCrashWindow = TimeSpan.FromSeconds(60);
     private static readonly TimeSpan HealthyRunTime = TimeSpan.FromSeconds(30);
+    private static readonly TimeSpan PortRetryInterval = TimeSpan.FromSeconds(3);
 
     private readonly object _gate = new();
     private readonly List<DateTime> _crashTimes = new();
@@ -168,6 +170,17 @@ public sealed class UxPlayLauncher : IDisposable
         if (!File.Exists(exePath))
         {
             SetState(LauncherState.MissingBinary, $"uxplay.exe introuvable : {exePath}");
+            return;
+        }
+
+        // Fail fast with an actionable message if another program already owns the AirPlay ports.
+        var portConflict = DescribePortConflict();
+        if (portConflict is not null)
+        {
+            Emit("[launcher] " + portConflict);
+            SetState(LauncherState.Failed,
+                portConflict + " Le récepteur redémarrera tout seul dès que le port sera libre.");
+            SchedulePortRetry(_restartCts.Token);
             return;
         }
 
@@ -325,6 +338,7 @@ public sealed class UxPlayLauncher : IDisposable
             if (_crashTimes.Count >= MaxRapidCrashes)
             {
                 SetState(LauncherState.Failed,
+                    DescribePortConflict() ??
                     $"Le récepteur s'arrête en boucle (code {exitCode}). Un autre programme utilise " +
                     "peut-être les ports 7000-7002, ou un antivirus/pare-feu bloque uxplay.exe.");
                 return;
@@ -354,6 +368,103 @@ public sealed class UxPlayLauncher : IDisposable
                 LaunchLocked();
             }
         });
+    }
+
+    /// <summary>
+    /// Polls the AirPlay ports every few seconds after a port conflict and relaunches
+    /// the receiver as soon as they are free. Stops on Stop()/Dispose().
+    /// </summary>
+    private void SchedulePortRetry(CancellationToken token)
+    {
+        _ = Task.Run(async () =>
+        {
+            while (true)
+            {
+                try
+                {
+                    await Task.Delay(PortRetryInterval, token);
+                }
+                catch (OperationCanceledException)
+                {
+                    return;
+                }
+
+                lock (_gate)
+                {
+                    if (_disposed || _stopRequested || token.IsCancellationRequested) return;
+                    if (_process is not null) return;
+                    if (DescribePortConflict() is not null) continue;
+
+                    Emit("[launcher] Port libéré, démarrage du récepteur.");
+                    LaunchLocked();
+                    return;
+                }
+            }
+        });
+    }
+
+    // Process-name fragments of well-known AirPlay/mirroring receivers that compete for ports 7000-7002.
+    private static readonly (string Fragment, string Display)[] KnownReceivers =
+    {
+        ("airserver", "AirServer"),
+        ("itunes", "iTunes"),
+        ("lonelyscreen", "LonelyScreen"),
+        ("reflector", "Reflector"),
+        ("airparrot", "AirParrot"),
+        ("uxplay", "une autre instance de UxPlay"),
+    };
+
+    /// <summary>
+    /// Returns a user-facing message when a TCP port in 7000-7002 is already listening, else null.
+    /// Never throws: if the check itself fails, the launch simply proceeds.
+    /// </summary>
+    private static string? DescribePortConflict()
+    {
+        try
+        {
+            var listeners = IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpListeners();
+            var busyPorts = new List<int>();
+            for (var port = AirPlayInfo.AirPlayPort; port <= AirPlayInfo.AirPlayPort + 2; port++)
+            {
+                if (listeners.Any(l => l.Port == port)) busyPorts.Add(port);
+            }
+            if (busyPorts.Count == 0) return null;
+
+            var suspects = new List<string>();
+            foreach (var proc in Process.GetProcesses())
+            {
+                try
+                {
+                    var name = proc.ProcessName.ToLowerInvariant();
+                    foreach (var (fragment, display) in KnownReceivers)
+                    {
+                        if (name.Contains(fragment) && !suspects.Contains(display))
+                            suspects.Add(display);
+                    }
+                }
+                catch
+                {
+                    // process exited while enumerating
+                }
+                finally
+                {
+                    proc.Dispose();
+                }
+            }
+
+            var ports = string.Join(", ", busyPorts);
+            var message = $"Le port {ports} est déjà utilisé par un autre programme, " +
+                          "AirGlass ne peut pas recevoir l'écran de l'iPhone.";
+            message += suspects.Count > 0
+                ? $" Programme(s) probable(s) : {string.Join(", ", suspects)}. Ferme-le puis relance le récepteur."
+                : " Ferme tout autre récepteur AirPlay (AirServer, iTunes, autre logiciel de mirroring) puis relance le récepteur.";
+            return message;
+        }
+        catch (Exception ex)
+        {
+            AppLog.Error("Vérification des ports AirPlay impossible", ex);
+            return null;
+        }
     }
 
     private void KillStaleProcesses(string exePath)
