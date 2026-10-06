@@ -6,7 +6,7 @@ using AirGlass.Services;
 namespace AirGlass;
 
 /// <summary>
-/// Main window: receiver status, firewall/license banners, tray integration.
+/// Main window: receiver status, firewall banner, tray integration.
 /// The window is created hidden; <see cref="Begin"/> is called by App on startup.
 /// </summary>
 public partial class MainWindow : Window

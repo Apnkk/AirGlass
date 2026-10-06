@@ -1,4 +1,4 @@
-﻿<Window x:Class="AirGlass.MainWindow"
+<Window x:Class="AirGlass.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:svc="clr-namespace:AirGlass.Services"
@@ -71,7 +71,7 @@
                 Padding="14,6" FontSize="12" Click="OnAboutClick" />
       </StackPanel>
 
-      <!-- Bandeaux d'alerte (pare-feu, licence) -->
+      <!-- Bandeaux d'alerte (pare-feu) -->
       <StackPanel Grid.Row="1" Margin="28,0,28,0">
         <Border x:Name="FirewallBanner" Visibility="Collapsed"
                 Style="{StaticResource GlassCard}" CornerRadius="12"

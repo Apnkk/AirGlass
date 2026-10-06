@@ -1,7 +1,7 @@
 AirGlass - Third-party software notices
 ========================================
 
-AirGlass's own user interface is proprietary software.
+AirGlass is free and open source software, licensed under the GPLv3 (see LICENSE).
 It starts and controls the separate program "uxplay.exe" (see below).
 That program is not part of AirGlass's own code and keeps its own license.
 

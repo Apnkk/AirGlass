@@ -64,11 +64,10 @@ npm run build:android   # out\airglass-android-promo.mp4
 | `Installer/` | Script Inno Setup et visuels de l'assistant |
 | `scripts/` | Build, génération d'icône et d'images d'installeur |
 | `promo/` | Projet Remotion des vidéos de présentation |
-| `tools/KeyGen/` | Générateur de clés de licence (usage vendeur uniquement) |
 | `docs/videos/` | Vidéos de présentation rendues |
 
 ## Licences tierces
 
-L'interface AirGlass est propriétaire. UxPlay (GPLv3), GStreamer, FFmpeg et scrcpy restent sous leurs licences respectives. Voir `THIRD-PARTY-NOTICES.txt`.
+AirGlass est libre et gratuit, sous licence GPLv3 (voir `LICENSE`). UxPlay (GPLv3), GStreamer, FFmpeg et scrcpy restent sous leurs licences respectives. Voir `THIRD-PARTY-NOTICES.txt`.
 
 AirPlay, iPhone et iOS sont des marques d'Apple Inc. AirGlass n'est ni affilié, ni approuvé, ni sponsorisé par Apple.
